@@ -59,7 +59,7 @@ def derivDemo():
     X = cv2.filter2D(img, -1, v)
     Y = cv2.filter2D(img, -1, v.T)
 
-    ori2 = np.arctan(Y, X).astype(np.float64)
+    ori2 = np.arctan2(Y, X).astype(np.float64)
     mag2 = np.sqrt(X ** 2 + Y ** 2).astype(np.float64)
 
     f, ax = plt.subplots(1, 2)
@@ -125,7 +125,6 @@ def houghDemo():
     img = cv2.imread('coins.jpg', cv2.IMREAD_GRAYSCALE) / 255
     min_r, max_r = 50, 100
 
-    # # TEST WITH YOUR IMPLEMENT ONLY
     # img = cv2.imread('pool_balls.jpg', cv2.IMREAD_GRAYSCALE) / 255
     # min_r, max_r = 10, 20
 
@@ -154,7 +153,7 @@ def houghDemo():
 
 
 def biliteralFilterDemo():
-    img = cv2.imread('input/boxMan.jpg', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('boxMan.jpg', cv2.IMREAD_GRAYSCALE)
     cv2.imwrite("original_image_grayscale.jpg", img)
 
     filtered_image_CV, filtered_image_my = bilateral_filter_implement(img, 9, 8.0, 1.0)
@@ -172,7 +171,7 @@ def main():
     # derivDemo()
     # blurDemo()
     # edgeDemo()
-    houghDemo()
+    # houghDemo()
     # biliteralFilterDemo()
 
 

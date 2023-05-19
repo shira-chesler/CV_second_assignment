@@ -58,7 +58,7 @@ def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     dev_x = conv2D(in_image, dev)
     dev_y = conv2D(in_image, dev.transpose())
     mag = np.sqrt(np.power(dev_x, 2) + np.power(dev_y, 2))
-    direct = np.arctan(dev_y, dev_x)
+    direct = np.arctan2(dev_y, dev_x)
     return direct, mag
 
 
@@ -210,10 +210,46 @@ def filter_results(circle_dictionary, number_of_steps, threshold_ratio):
     final_result = []
     for circle, count in sorted(circle_dictionary.items(), key=lambda v: -v[1]):
         nx, ny, rad = circle
+        # checks num that voted and that the current circle is inside no other circle
         if count / number_of_steps >= threshold_ratio and all(
                 (nx - x) ** 2 + (ny - y) ** 2 > r ** 2 for x, y, r in final_result):
             final_result.append((nx, ny, rad))
     return final_result
+
+
+def my_bilateral_filter(in_image, k_size, sigma_color, sigma_space):
+    # create an empty image to store the result
+    my_filtered_image = np.zeros_like(in_image)
+
+    # apply padding to the original image
+    half_k_size = k_size // 2
+    padded_image = np.pad(in_image, half_k_size, mode='reflect')
+
+    # for each pixel in the image...
+    for i in range(in_image.shape[0]):
+        for j in range(in_image.shape[1]):
+
+            # get the region of interest
+            roi = padded_image[i:i + k_size, j:j + k_size]
+
+            # compute the color weights
+            color_distances = np.abs(roi - in_image[i, j])
+            color_weights = np.exp(-color_distances ** 2 / (2 * sigma_color ** 2))
+
+            # calculate the spatial weights
+            space_weights = np.zeros((k_size, k_size))
+            for k in range(k_size):
+                for l in range(k_size):
+                    d = ((k - half_k_size) ** 2 + (l - half_k_size) ** 2) ** 0.5
+                    space_weights[k, l] = np.exp(-d ** 2 / (2 * sigma_space ** 2))
+
+            # combine the space and color weights
+            combined_weights = space_weights * color_weights
+
+            # apply the filter
+            my_filtered_image[i, j] = np.sum(roi * combined_weights) / np.sum(combined_weights)
+
+    return my_filtered_image
 
 
 def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: float, sigma_space: float) -> (
@@ -225,4 +261,8 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     :param sigma_space: represents the filter sigma in the coordinate.
     :return: Open CV implementation, my implementation
     """
-    pass
+    cv_filtered_image = cv2.bilateralFilter(in_image, k_size, sigma_color, sigma_space)
+
+    my_filtered_image = my_bilateral_filter(in_image, k_size, sigma_color, sigma_space)
+
+    return cv_filtered_image, my_filtered_image

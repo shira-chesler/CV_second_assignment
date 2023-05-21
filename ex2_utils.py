@@ -128,6 +128,7 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
 
 def search_zero_crossing(mat: np.ndarray) -> np.ndarray:
     edges = np.zeros_like(mat)
+
     for i in range(0, mat.shape[0]):
         for j in range(0, mat.shape[1]):
             if mat[i, j] == 0:
@@ -210,6 +211,7 @@ def filter_results(circle_dictionary, number_of_steps, threshold_ratio):
     final_result = []
     for circle, count in sorted(circle_dictionary.items(), key=lambda v: -v[1]):
         nx, ny, rad = circle
+
         # checks num that voted and that the current circle is inside no other circle
         if count / number_of_steps >= threshold_ratio and all(
                 (nx - x) ** 2 + (ny - y) ** 2 > r ** 2 for x, y, r in final_result):
@@ -218,14 +220,10 @@ def filter_results(circle_dictionary, number_of_steps, threshold_ratio):
 
 
 def my_bilateral_filter(in_image, k_size, sigma_color, sigma_space):
-    # create an empty image to store the result
     my_filtered_image = np.zeros_like(in_image)
-
-    # apply padding to the original image
     half_k_size = k_size // 2
     padded_image = np.pad(in_image, half_k_size, mode='reflect')
 
-    # for each pixel in the image...
     for i in range(in_image.shape[0]):
         for j in range(in_image.shape[1]):
 

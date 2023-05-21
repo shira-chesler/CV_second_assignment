@@ -1,8 +1,6 @@
 from ex2_utils import *
 import matplotlib.pyplot as plt
-import numpy as np
 import time
-import cv2
 
 
 def MSE(a: np.ndarray, b: np.ndarray) -> float:
@@ -28,7 +26,7 @@ def conv1Demo():
 
 
 def conv2Demo():
-    img = cv2.imread('beach.jpg', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('input/beach.jpg', cv2.IMREAD_GRAYSCALE)
     kernel = np.ones((5, 5))
     kernel = kernel / kernel.sum()
     c_img = conv2D(img, kernel) / 255
@@ -45,8 +43,22 @@ def conv2Demo():
 
 
 def derivDemo():
-    img = cv2.imread('beach.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    img = cv2.imread('input/beach.jpg', cv2.IMREAD_GRAYSCALE) / 255
     ori, mag = convDerivative(img)
+
+    f, ax = plt.subplots(1, 2)
+    ax[0].set_title('Ori')
+    ax[1].set_title('Mag')
+    ax[0].imshow(ori)
+    ax[1].imshow(mag*255)
+    plt.show()
+
+    v = np.array([[1, 0, -1]])
+    X = cv2.filter2D(img, -1, v)
+    Y = cv2.filter2D(img, -1, v.T)
+
+    ori = np.arctan2(Y, X).astype(np.float64)
+    mag = np.sqrt(X ** 2 + Y ** 2).astype(np.float64)
 
     f, ax = plt.subplots(1, 2)
     ax[0].set_title('Ori')
@@ -55,28 +67,9 @@ def derivDemo():
     ax[1].imshow(mag)
     plt.show()
 
-    v = np.array([[1, 0, -1]])
-    X = cv2.filter2D(img, -1, v)
-    Y = cv2.filter2D(img, -1, v.T)
-
-    ori2 = np.arctan2(Y, X).astype(np.float64)
-    mag2 = np.sqrt(X ** 2 + Y ** 2).astype(np.float64)
-
-    f, ax = plt.subplots(1, 2)
-    ax[0].set_title('Ori')
-    ax[1].set_title('Mag')
-    ax[0].imshow(ori2)
-    ax[1].imshow(mag2)
-    plt.show()
-
-    # print("Direction MSE: {}".format(MSE(ori, ori2)))
-    # print("Magnitude MSE: {}".format(MSE(mag, mag2)))
-    # print("Direction Max Error: {}".format(np.abs(ori - ori2).max()))
-    # print("Magnitude Max Error: {}".format(np.abs(mag - mag2).max()))
-
 
 def blurDemo():
-    img = cv2.imread('beach.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    img = cv2.imread('input/beach.jpg', cv2.IMREAD_GRAYSCALE) / 255
     k_size = 5
     b1 = blurImage1(img, k_size)
     b2 = blurImage2(img, k_size)
@@ -91,7 +84,7 @@ def blurDemo():
 
 
 def edgeDemoSimple():
-    img = cv2.imread('codeMonkey.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    img = cv2.imread('input/codeMonkey.jpg', cv2.IMREAD_GRAYSCALE) / 255
     img = cv2.resize(img, (0, 0), fx=.25, fy=.25)
     edge_matrix = edgeDetectionZeroCrossingSimple(img)
 
@@ -104,7 +97,7 @@ def edgeDemoSimple():
 
 
 def edgeDemoLOG():
-    img = cv2.imread('boxMan.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    img = cv2.imread('input/boxMan.jpg', cv2.IMREAD_GRAYSCALE) / 255
     img = cv2.resize(img, (0, 0), fx=.25, fy=.25)
     edge_matrix = edgeDetectionZeroCrossingLOG(img)
 
@@ -122,10 +115,11 @@ def edgeDemo():
 
 
 def houghDemo():
-    img = cv2.imread('coins.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    img = cv2.imread('input/coins.jpg', cv2.IMREAD_GRAYSCALE) / 255
     min_r, max_r = 50, 100
 
-    # img = cv2.imread('pool_balls.jpg', cv2.IMREAD_GRAYSCALE) / 255
+    # # TEST WITH YOUR IMPLEMENT ONLY
+    # img = cv2.imread('input/pool_balls.jpg', cv2.IMREAD_GRAYSCALE) / 255
     # min_r, max_r = 10, 20
 
     # Mine
@@ -153,8 +147,8 @@ def houghDemo():
 
 
 def biliteralFilterDemo():
-    img = cv2.imread('boxMan.jpg', cv2.IMREAD_GRAYSCALE)
-    cv2.imwrite("original_image_grayscale.jpg", img)
+    img = cv2.imread('input/boxMan.jpg', cv2.IMREAD_GRAYSCALE)
+    # cv2.imwrite("original_image_grayscale.jpg", img)
 
     filtered_image_CV, filtered_image_my = bilateral_filter_implement(img, 9, 8.0, 1.0)
     cv2.imwrite("filtered_image_OpenCV.jpg", filtered_image_CV)
@@ -166,13 +160,13 @@ def biliteralFilterDemo():
 
 def main():
     print("ID:", myID())
-    # conv1Demo()
-    # conv2Demo()
-    # derivDemo()
-    # blurDemo()
-    # edgeDemo()
-    # houghDemo()
-    # biliteralFilterDemo()
+    conv1Demo()
+    conv2Demo()
+    derivDemo()
+    blurDemo()
+    edgeDemo()
+    houghDemo()
+    biliteralFilterDemo()
 
 
 if __name__ == '__main__':
